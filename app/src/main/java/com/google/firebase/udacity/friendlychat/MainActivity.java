@@ -17,6 +17,7 @@ package com.google.firebase.udacity.friendlychat;
 
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -31,6 +32,8 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -60,6 +63,10 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference mMessageDatabaseReference;
     private ChildEventListener mChildEventListener;
 
+    // firebase authentication object variables
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseAuth.AuthStateListener mAuthStateListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +78,8 @@ public class MainActivity extends AppCompatActivity {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         // get a 'reference' to the messages 'child' inside the database
         mMessageDatabaseReference = mFirebaseDatabase.getReference().child("messages");
+
+        mFirebaseAuth = FirebaseAuth.getInstance();
 
         // Initialize references to views
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -160,6 +169,27 @@ public class MainActivity extends AppCompatActivity {
         // attached the 'listener' to a 'child' of the database
         mMessageDatabaseReference.addChildEventListener(mChildEventListener);
 
+        // make a new Firebase Authentication Listener
+        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+
+            // attach 'authStateListener' to 'onResume' and 'onPause'
+
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                // get Firebase user
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+
+                // check if user is signed in
+                if ( user != null) {
+                    // user is signed in
+
+                } else {
+                    // user is signed out, make user sign in with Firebase login UI
+                    // TODO: begin to do 'implement' the Login flow
+                }
+            }
+
+        };
 
     } // onCreate
 
@@ -173,6 +203,24 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // Remove Firebase authentication listener
+        mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Add Firebase authentication listener
+        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+
     }
 
 } // class
