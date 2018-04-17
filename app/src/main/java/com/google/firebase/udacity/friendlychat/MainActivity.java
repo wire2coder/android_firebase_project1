@@ -32,6 +32,8 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.auth.api.Auth;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -41,6 +43,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -58,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
     private Button mSendButton;
 
     private String mUsername;
+
+    public static final int RC_SIGN_IN = 1;
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mMessageDatabaseReference;
@@ -179,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
                 // get Firebase user
                 FirebaseUser user = firebaseAuth.getCurrentUser();
 
+
                 // check if user is signed in
                 if ( user != null) {
                     // user is signed in
@@ -186,6 +192,18 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     // user is signed out, make user sign in with Firebase login UI
                     // TODO: begin to do 'implement' the Login flow
+
+                    // User is signed out
+                    startActivityForResult(
+                            AuthUI.getInstance()
+                                    .createSignInIntentBuilder()
+                                    .setIsSmartLockEnabled(false)
+                                    .setProviders(
+                                            AuthUI.EMAIL_PROVIDER,
+                                            AuthUI.GOOGLE_PROVIDER)
+                                    .build(),
+                            RC_SIGN_IN);
+
                 }
             }
 
