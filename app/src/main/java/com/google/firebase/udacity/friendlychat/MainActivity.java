@@ -15,6 +15,7 @@
  */
 package com.google.firebase.udacity.friendlychat;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
@@ -31,6 +32,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.auth.api.Auth;
@@ -189,6 +191,9 @@ public class MainActivity extends AppCompatActivity {
                 if ( user != null) {
                     // user is signed in
 
+                    mUsername = user.getDisplayName();
+                    attachData
+
                 } else {
                     // user is signed out, make user sign in with Firebase login UI
                     // TODO: begin to do 'implement' the Login flow
@@ -211,6 +216,40 @@ public class MainActivity extends AppCompatActivity {
 
     } // onCreate
 
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if ( requestCode == RC_SIGN_IN ) {
+            if ( resultCode == RESULT_OK ) { // >> -1
+
+                // user logged in
+                Toast.makeText(this, "Signed in!", Toast.LENGTH_LONG).show();
+
+            } else {
+
+                // user exit the 'Main' activity
+
+                Toast.makeText(this, "Sign in canceled", Toast.LENGTH_LONG).show();
+                finish();
+            }
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch( item.getItemId() ) {
+
+            case R.id.sign_out_menu:
+                // sign the user out
+                AuthUI.getInstance().signOut(this);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -218,10 +257,6 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     protected void onPause() {
